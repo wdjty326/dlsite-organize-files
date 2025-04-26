@@ -1,4 +1,9 @@
 {
+	"scripts": {
+		"watch": "tsc --watch",
+		"build": "tsc",
+		"start": "node dist/index.js"
+	},
 	"devDependencies": {
 		"@types/node": "^22.14.1",
 		"typescript": "^5.8.3"
@@ -8,6 +13,7 @@
 		"axios": "^1.8.4",
 		"cheerio": "^1.0.0",
 		"dotenv": "^16.5.0",
+		"glob": "^11.0.2",
 		"iconv-lite": "^0.6.3"
 	}
 }
