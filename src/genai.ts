@@ -1,7 +1,10 @@
+import dotenv from 'dotenv'
 import { GoogleGenAI, HarmBlockThreshold, HarmCategory } from '@google/genai'
 
+dotenv.config()
+
 const genai = new GoogleGenAI({
-    apiKey: process.env.GOOGLE_API_KEY
+    apiKey: process.env.GEMINI_API_KEY
 })
 
 const translateJapaneseToKorean = async (text: string) => {
@@ -10,10 +13,7 @@ const translateJapaneseToKorean = async (text: string) => {
         contents: [{
             role: 'user',
             parts: [{
-                text: `
-                
-                
-                `
+                text: `Translate Japanese to Korean. Provide only the translated Korean text, without any additional explanation. Do not append a newline character (\\n) at the end of the result.`
             }]
         }, {
             role: 'user',
@@ -22,9 +22,6 @@ const translateJapaneseToKorean = async (text: string) => {
             }]
         }],
         config: {
-            // thinkingConfig: {
-            //     thinkingBudget: 0, // 추론을 사용하지 않음
-            // },
             temperature: 1,
             safetySettings: [
                 {
