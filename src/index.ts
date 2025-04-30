@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs, { renameSync } from 'fs'
 import path from 'path'
 import { globSync } from 'glob'
 import dotenv from 'dotenv'
@@ -6,7 +6,7 @@ import axios from 'axios'
 import { load } from 'cheerio'
 import translateJapaneseToKorean from './genai'
 import { rename } from 'fs/promises'
-
+import unzipFile from './unzip'
 dotenv.config()
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -49,8 +49,14 @@ const filesToProcess = globSync(`${process.env.TARGET_PATH}/*`)
             let retries = 3;
             while (retries > 0) {
                 try {
-                    await rename(pathStr, newPath);
+                    renameSync(pathStr, newPath);
                     console.log(`Successfully renamed to ${newBaseName}`);
+
+                    if (extName === '.zip') {
+                        await unzipFile(newPath, path.dirname(newPath), 'smpeople')
+                        fs.rmSync(newPath, { recursive: true, force: true })
+                    }
+                    
                     break;
                 } catch (renameError: any) {
                     if (renameError.code === 'EBUSY' && retries > 1) {
