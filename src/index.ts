@@ -1,4 +1,4 @@
-import fs, { renameSync } from 'fs'
+import fs from 'fs'
 import path from 'path'
 import { globSync } from 'glob'
 import dotenv from 'dotenv'
@@ -40,7 +40,12 @@ const filesToProcess = globSync(`${process.env.TARGET_PATH}/*`)
                 finalProductName = productName;
             }
 
-            const newBaseName = `[${makerName}][${rjCode}]${finalProductName.replace(/\n|\r/g, '')}${extName !== '' ? extName : ''}`;
+            // Sanitize the final product name for use in the file path
+            const safeProductName = finalProductName
+                .replace(/[\/\\:\*\?"<>\|]/g, '-') // Replace basic invalid characters
+                .replace(/[：～]/g, '-'); // Replace additional problematic characters
+
+            const newBaseName = `[${makerName}][${rjCode}]${safeProductName.replace(/\n|\r/g, '')}${extName !== '' ? extName : ''}`;
             const newPath = path.join(process.env.TARGET_PATH as string, newBaseName);
 
             console.log(`Renaming ${path.basename(pathStr)} to ${newBaseName}`);
@@ -49,7 +54,7 @@ const filesToProcess = globSync(`${process.env.TARGET_PATH}/*`)
             let retries = 3;
             while (retries > 0) {
                 try {
-                    renameSync(pathStr, newPath);
+                    await rename(pathStr, newPath);
                     console.log(`Successfully renamed to ${newBaseName}`);
 
                     if (extName === '.zip') {
