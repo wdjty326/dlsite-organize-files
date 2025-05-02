@@ -14,6 +14,12 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 const filesToProcess = globSync(`${process.env.TARGET_PATH}/*`)
     .filter(pathStr => !pathStr.match(/\[.+\]\[RJ\d{1,}\](\[노\])?.+/g) && pathStr.match(/RJ\d{1,}/));
 
+const destPath = path.join(process.env.TARGET_PATH as string, 'dist');
+if (!fs.existsSync(destPath)) {
+    fs.mkdirSync(destPath, { recursive: true });
+}
+
+
 (async () => {
     for (const pathStr of filesToProcess) {
         try {
@@ -46,7 +52,7 @@ const filesToProcess = globSync(`${process.env.TARGET_PATH}/*`)
                 .replace(/[：～]/g, '-'); // Replace additional problematic characters
 
             const newBaseName = `[${makerName}][${rjCode}]${safeProductName.replace(/\n|\r/g, '')}${extName !== '' ? extName : ''}`;
-            const newPath = path.join(process.env.TARGET_PATH as string, newBaseName);
+            const newPath = path.join(destPath, newBaseName);
 
             console.log(`Renaming ${path.basename(pathStr)} to ${newBaseName}`);
 
@@ -54,12 +60,12 @@ const filesToProcess = globSync(`${process.env.TARGET_PATH}/*`)
             let retries = 3;
             while (retries > 0) {
                 try {
-                    await rename(pathStr, newPath);
+                    fs.renameSync(pathStr, newPath);
                     console.log(`Successfully renamed to ${newBaseName}`);
 
                     if (extName === '.zip') {
                         await unzipFile(newPath, path.dirname(newPath), 'smpeople')
-                        fs.rmSync(newPath, { recursive: true, force: true })
+                        // fs.rmSync(newPath, { recursive: true, force: true })
                     }
                     
                     break;
