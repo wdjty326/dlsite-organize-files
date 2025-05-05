@@ -3,8 +3,8 @@ import path from 'path';
 
 async function unzipFile(zipFilePath: string, destPath: string, password?: string) {
   try {
-    const absoluteZipPath = path.resolve(zipFilePath);
-    const absoluteDestPath = path.resolve(destPath);
+    const absoluteZipPath = zipFilePath;
+    const absoluteDestPath = destPath;
 
     console.log(`압축 해제 시작: ${absoluteZipPath} -> ${absoluteDestPath}`);
 
@@ -12,6 +12,7 @@ async function unzipFile(zipFilePath: string, destPath: string, password?: strin
     if (password) {
       options.password = password;
     }
+    console.log(options)
 
     await extract(absoluteZipPath, options);
 
